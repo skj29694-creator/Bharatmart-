@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BharatMart - भारत का ऑनलाइन बाजार</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f3f6;color:#222}
+header{background:#087e68;color:white;padding:14px}
+.brand{font-size:26px;font-weight:bold}
+.tagline{font-size:12px;margin:5px 0}
+.search{display:flex;margin-top:12px}
+.search input{width:100%;padding:12px;border:0;border-radius:5px 0 0 5px}
+.search button{padding:12px;background:#ffcf40;border:0}
+nav{display:flex;justify-content:space-around;background:white;padding:12px 3px;gap:8px}
+nav a{color:#222;text-decoration:none;font-size:13px}
+.hero{background:linear-gradient(110deg,#ff9b35,#f8df8e,#54bd86);padding:30px 20px}
+.hero h1{font-size:27px}
+.btn{display:inline-block;background:#087e68;color:white;padding:12px 18px;border:0;border-radius:5px;text-decoration:none}
+h2{font-size:20px;margin:20px 12px 12px}
+.categories{display:flex;overflow:auto;gap:12px;padding:10px}
+.cat{min-width:90px;background:white;padding:15px 8px;text-align:center;border-radius:8px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px}
+.card{background:white;border-radius:8px;padding:10px}
+.pic{height:115px;display:flex;align-items:center;justify-content:center;background:#f7f7f7;font-size:54px}
+.card h3{font-size:14px;min-height:34px}
+.price{font-size:19px;font-weight:bold}
+.old{font-size:12px;color:#777;text-decoration:line-through}
+.card button{width:100%;padding:10px;margin-top:8px;background:#ffcf40;border:0;border-radius:5px}
+footer{text-align:center;background:#102d29;color:white;padding:24px;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">🇮🇳 BharatMart</div>
+<div class="tagline">Har Bharatvasi Ka Apna Bazaar</div>
+<div class="search">
+<input id="search" placeholder="मोबाइल, कपड़े और सामान खोजें..." oninput="showProducts()">
+<button onclick="showProducts()">🔍</button>
+</div>
+</header>
+<nav>
+<a href="#">होम</a><a href="#categories">कैटेगरी</a>
+<a href="#products">प्रोडक्ट</a><a href="#cart">🛒 कार्ट (<span id="count">0</span>)</a>
+</nav>
+<section class="hero">
+<h1>हर भारतवासी का अपना बाजार!</h1>
+<p>खरीदारी करें और भारत के छोटे कारोबारियों का साथ दें।</p>
+<a href="#products" class="btn">अभी खरीदें →</a>
+</section>
+<h2 id="categories">🛍️ कैटेगरी चुनें</h2>
+<div class="categories">
+<div class="cat" onclick="filterCat('मोबाइल')">📱<br>मोबाइल</div>
+<div class="cat" onclick="filterCat('फैशन')">👕<br>फैशन</div>
+<div class="cat" onclick="filterCat('इलेक्ट्रॉनिक्स')">🎧<br>इलेक्ट्रॉनिक्स</div>
+<div class="cat" onclick="filterCat('घर')">🏠<br>घर</div>
+<div class="cat" onclick="filterCat('कृषि')">🌾<br>कृषि</div>
+</div>
+<h2 id="products">🔥 लोकप्रिय प्रोडक्ट</h2>
+<div class="products" id="list"></div>
+<h2 id="cart">🛒 तुम्हारा कार्ट</h2>
+<div id="cartitems" style="padding:12px">कार्ट खाली है।</div>
+<footer>
+<h2>BharatMart 🇮🇳</h2>
+<p>हर भारतवासी का अपना बाजार</p>
+<p>यह शुरुआती वेबसाइट है। दिखाए गए प्रोडक्ट डेमो के लिए हैं।</p>
+</footer>
+<script>
+const items=[
+{name:"5G स्मार्टफोन",price:6999,cat:"मोबाइल",icon:"📱"},
+{name:"वायरलेस ईयरबड्स",price:499,cat:"इलेक्ट्रॉनिक्स",icon:"🎧"},
+{name:"स्मार्ट वॉच",price:999,cat:"इलेक्ट्रॉनिक्स",icon:"⌚"},
+{name:"पुरुषों की टी-शर्ट",price:299,cat:"फैशन",icon:"👕"},
+{name:"स्पोर्ट्स शूज़",price:799,cat:"फैशन",icon:"👟"},
+{name:"किचन सेट",price:399,cat:"घर",icon:"🍳"},
+{name:"टेबल लैंप",price:349,cat:"घर",icon:"💡"},
+{name:"कृषि उपकरण",price:599,cat:"कृषि",icon:"🌾"}
+];
+let cart=JSON.parse(localStorage.getItem("bharatCart")||"[]");
+let category="";
+function showProducts(){
+let q=(document.getElementById("search").value||"").toLowerCase();
+let filtered=items.filter(p=>(p.name+" "+p.cat).toLowerCase().includes(q)&&(!category||p.cat===category));
+document.getElementById("list").innerHTML=filtered.map((p,i)=>`
+<div class="card"><div class="pic">${p.icon}</div>
+<h3>${p.name}</h3><div class="price">₹${p.price.toLocaleString("en-IN")}</div>
+<div class="old">₹${Math.round(p.price*1.2).toLocaleString("en-IN")}</div>
+<button onclick="addCart('${p.name}')">कार्ट में डालें</button></div>`).join("")||"कोई प्रोडक्ट नहीं मिला।";
+}
+function filterCat(c){category=category===c?"":c;showProducts();document.getElementById("products").scrollIntoView();}
+function addCart(name){cart.push(name);localStorage.setItem("bharatCart",JSON.stringify(cart));renderCart();}
+function renderCart(){
+document.getElementById("count").textContent=cart.length;
+document.getElementById("cartitems").innerHTML=cart.length?cart.map((n,i)=>`<div style="background:white;padding:10px;margin:5px 0">${n} <button onclick="removeItem(${i})">हटाएँ</button></div>`).join("")+'<p>यह अभी डेमो कार्ट है। असली ऑर्डर और पेमेंट चालू नहीं हैं।</p>':"कार्ट खाली है।";
+}
+function removeItem(i){cart.splice(i,1);localStorage.setItem("bharatCart",JSON.stringify(cart));renderCart();}
+showProducts();renderCart();
+</script>
+</body>
+</html>
